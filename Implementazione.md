@@ -32,10 +32,10 @@ message match
         println(s"Force state change to ${transition}")  
         utilityActor = forceStateChange(context, transition)  
         Behaviors.same  
-    case Subscribe(requester: ActorRef[Message]) =>  
+    case Subscribe(requester: ActorRef[DeviceMessage]) =>  
         subscribe(context.self, requester)  
         Behaviors.same  
-    case PropagateStatus(requester: ActorRef[Message]) =>  
+    case PropagateStatus(requester: ActorRef[DeviceMessage]) =>  
         propagate(context.self, requester)  
         Behaviors.same
 ```
@@ -47,7 +47,7 @@ Le higher-order functions sono un costrutto che permette di utilizzare funzioni 
 ```scala
 class ConditionalState[T](name: String, condFunction: (T, Seq[T]) => Boolean) extends State[T](name):  
   
-    private val behavior: Behavior[Message] = Behaviors.receiveMessage[Message] { msg =>  
+    private val behavior: Behavior[DeviceMessage] = Behaviors.receiveMessage[DeviceMessage] { msg =>  
         msg match  
             case MessageWithReply(msg: T, replyTo, args: _*) =>  
                 if condFunction(msg, args.asInstanceOf[Seq[T]]) then  
@@ -69,7 +69,7 @@ type ConditionalFunction[T] = (T, Seq[T]) => Boolean
 
 class ConditionalState[T](name: String, condFunction: ConditionalFunction[T]) extends State[T](name):  
   
-    private val behavior: Behavior[Message] = Behaviors.receiveMessage[Message] { msg =>  
+    private val behavior: Behavior[DeviceMessage] = Behaviors.receiveMessage[DeviceMessage] { msg =>  
         msg match  
             case MessageWithReply(msg: T, replyTo, args: _*) =>  
                 if condFunction(msg, args.asInstanceOf[Seq[T]]) then  
@@ -79,6 +79,16 @@ class ConditionalState[T](name: String, condFunction: ConditionalFunction[T]) ex
             case _ =>  
         Behaviors.same  
     }
+```
+
+## Type bounds
+I Type bounds permettono di specificare i vincoli sui parametri di tipo e possono essere usati per migliorare la sicurezza dei tipi, la leggibilità e le prestazioni del codice. Infatti, oltre a poter facilitare la comprensione del codice da parte di altri programmatori, può anche aiutare il compilatore a generare codice più efficiente.
+
+### Upper type bounds 
+Gli Upper type bounds servono per specificare che un tipo deve essere un sottotipo di un altro tipo.
+
+```scala
+case class Subscribe[M <: Message](replyTo: ActorRef[M]) extends DeviceMessage
 ```
 
 ## Options
@@ -111,8 +121,27 @@ trait Condition[I: DataType, O: DataType](condition: O => Boolean, replyTo: Acto
 new Actuator[String]("actuatorTest", fsm) with Condition[String, String]
 ```
 
-## Type Class
-//TODO
+## Type classes
+Le Type classes permettono di definire comportamenti - sotto forma di metodi - che possono essere "aggiunti" ai tipi esistenti, senza modificare il codice sorgente di tali tipi.
+
+```scala
+trait DataType[T]:
+  def defaultValue: T
+
+object DataType:
+  def defaultValue[T](using data: DataType[T]): T = data.defaultValue
+
+object GivenDataType:
+  given IntDataType: DataType[Int] with
+    override def defaultValue: Int = 0
+
+  given DoubleDataType: DataType[Double] with
+    override def defaultValue: Double = 0.0
+  
+  given BooleanDataType: DataType[Boolean] with
+    override def defaultValue: Boolean = false
+...
+```
 
 ## Partial functions
 
@@ -121,6 +150,22 @@ private def handleReadOrTakeRequest[A](in: ReadOrTakeRequest)(readOrTake: (Textu
     val space = textualSpaces(in.tupleSpaceID.getOrElse(TupleSpaceID("")).id)  
     handleFutureRequest(space)(() => Future.failed(new IllegalArgumentException("Tuple space not found")))(() => readOrTake(space, in.template.textualTemplate.get.regex, timeout))  
 }
+
+def basicBehavior[T](device: Device[T], ctx: ActorContext[DeviceMessage]): PartialFunction[DeviceMessage, Behavior[DeviceMessage]] =
+    case PropagateStatus(requesterRef: ActorRef[DeviceMessage]) =>
+        device.propagate(ctx.self, requesterRef) 
+        Behaviors.same
+    case Subscribe(replyTo: ActorRef[DeviceMessage]) =>
+        device.subscribe(ctx.self, replyTo)
+        Behaviors.same
+    case Unsubscribe(replyTo: ActorRef[DeviceMessage]) =>
+        device.unsubscribe(ctx.self, replyTo)
+        Behaviors.same
+
+def timedBehavior[T](device: Device[T], ctx: ActorContext[DeviceMessage]): PartialFunction[DeviceMessage, Behavior[DeviceMessage]] =
+    case Tick =>
+        device.propagate(ctx.self, ctx.self)
+        Behaviors.same
 ```
 
 ## Generics
@@ -266,6 +311,37 @@ Gli unit test che ho sviluppato comprendono le classi:
 * `GraphTest`
 * `ActuatorTest`
 * `TusowLogicHandlerTest`
+
+## Bruno Esposito
+
+Durante la prima fase di sviluppo del progetto ho collaborato alla definizione astratta di `Device` caratterizzata da `Sensor` e da `Actuator` - composto da una macchina a stati finiti -, ed alla implementazione dei moduli del device e del sensore. Successivamente, sempre nella prima fase di sviluppo, ho collaborato anche alla loro definizione concreta con `BasicSensor` e `ProcessedDataSensor` (usando il mix-in) e mi sono occupato della relativa implementazione ad attori.
+In seguito ho definito il protocollo `DeviceProtocol` per lo scambio di messaggi tra dispositivi (sensori e attuatori) in modo tale da poter distinguere i messaggi di sensori e di attuatori da quelli comuni ad entrambi. 
+Dopodiché sono passato allo sviluppo di `DataType`, definendo in particolare i tipi di dato che qualsiasi dispositivo avrebbe potuto gestire come input/output. Per farlo ho sfruttato le Type classes per fare in modo che l'utente potesse dichiarare dispositivi utilizzando alcuni tipi di scala già esistenti e per avere un valore di default con cui inizializzare i dispositivi alla creazione a seconda del tipo specificato. In questo modo si permette, eventualmente, l'aggiunta di ulteriori comportamenti che potranno essere condivisi tra i diversi tipi e si ottiene un'implementazione del codice estendibile, flessibile e facile da mantenere (anche grazie ad una tale struttura del codice).
+Infine, ho collaborato all'implementazione dell'attore `TusowBinder` che utilizza l'integrazione di TuSoW con akka gRPC per memorizzare i dati rilevati dai dispositivi di un cluster.
+
+Le classi progettate e implementate da me sono:
+* `Timer`
+* `Condition`
+* `BasicSensor`
+* `ProcessedDataSensor`
+* `SensorActor`
+* `DeviceBehavior`
+* `Status`
+* `PropagateStatus`
+* `UpdateStatus`
+* `MessageWithReply`
+* `DataType`
+* `GivenDataType`
+
+Le classi che ho contribuito a progettare sono:
+* `Device`
+* `Sensor`
+* `DeviceProtocol`
+* `TusowBinder`
+
+Gli unit test che ho sviluppato comprendono le classi:
+* `SensorTest`
+* `SensorMixinTest`
 
 ## Andrea Ingargiola
 

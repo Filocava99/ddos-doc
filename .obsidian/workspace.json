@@ -149,14 +149,14 @@
   "active": "cb9577f57466969f",
   "lastOpenFiles": [
     "Implementazione.md",
-    "Requisiti.md",
     "Processo-di-sviluppo.md",
+    "Index.md",
+    "Introduzione.md",
+    "Design-architetturale.md",
+    "Design-di-dettaglio.md",
+    "Requisiti.md",
     "images/git-tree.png",
     "images/epic.png",
-    "images/backlog.png",
-    "images/board.png",
-    "images/branches.png",
-    "Sviluppi-futuri.md",
-    "Design-di-dettaglio.md"
+    "images/backlog.png"
   ]
 }

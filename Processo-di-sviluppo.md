@@ -38,7 +38,7 @@ Il branch `development` è il branch che contiene il codice in via di sviluppo (
 Per ogni Ticket viene creato un branch a partire da `development`, chiamato `feature/ID-DEL-TICKET-JIRA` (e.g. `feature/PPS-5`), il quale verrà *mergiato* sul branch padre al termine dello sviluppo (creazione dei test compresa).  
 In caso di bug non riscontrati tramite unit test, è possibile creare un branch da `development` chiamato `bugfix/ID-DEL-TICKET-BUG` al quale andranno applicate le stesse regole dei branch `feature/*`.  
 
-![Branches](git-tree.png)
+![Branches](./images/git-tree.png)
 
 ## Commits conventions
 

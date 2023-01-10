@@ -325,4 +325,4 @@ assert(readResponse == "[X = juliet]")
 
 La struttura dei package del progetto è la seguente:
 
-![Packages UML](https://i.imgur.com/YOS8yNq.png)
+![Packages UML](https://i.imgur.com/LmQ8MlS.png)
