@@ -13,7 +13,7 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "Processo-di-sviluppo.md",
+                "file": "Design-di-dettaglio.md",
                 "mode": "source",
                 "source": false
               }
@@ -85,7 +85,7 @@
             "state": {
               "type": "backlink",
               "state": {
-                "file": "Processo-di-sviluppo.md",
+                "file": "Design-di-dettaglio.md",
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -102,7 +102,7 @@
             "state": {
               "type": "outgoing-link",
               "state": {
-                "file": "Processo-di-sviluppo.md",
+                "file": "Design-di-dettaglio.md",
                 "linksCollapsed": false,
                 "unlinkedCollapsed": true
               }
@@ -125,7 +125,7 @@
             "state": {
               "type": "outline",
               "state": {
-                "file": "Processo-di-sviluppo.md"
+                "file": "Design-di-dettaglio.md"
               }
             }
           }
@@ -148,12 +148,12 @@
   },
   "active": "cb9577f57466969f",
   "lastOpenFiles": [
-    "Index.md",
+    "Implementazione.md",
     "Processo-di-sviluppo.md",
+    "Index.md",
     "Introduzione.md",
     "Design-architetturale.md",
     "Design-di-dettaglio.md",
-    "Implementazione.md",
     "Requisiti.md",
     "images/git-tree.png",
     "images/epic.png",
