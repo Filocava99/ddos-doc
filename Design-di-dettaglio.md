@@ -55,10 +55,14 @@ object Deployer:
     })  
     devicesGraph @-> ((k, v) => v.map(it => devicesActorRefMap.get(it.id)).filter(_.isDefined).foreach(device => devicesActorRefMap(k.id).ref ! Subscribe(device.get.ref)))  
 ```
+### MVC
 
+*MVC* è un design pattern molto diffuso nello sviluppo di sistemi software.
+E' stato utilizzato per lo sviluppo della Demo andando a separare i compiti tra l'Interfaccia Grafica ed il Controller.
+ 
 ### Factory
 
-Il pattern *factory* è stato utilizzato per favorire l'usabilità della libreria, facilitando la creazione di alcuni oggetti complessi che avrebbero richiesto costruttori molto verbosi o con forti dipendenze temporali dovuti alla programmazione ad attori. Un esempio dell'appplicazione di questo pattern è la generazione di un `Group` a partire da un `Tag` richiamando il *factoryMethod* `generateGroup()`, che ha come argomento una lista di `ActorRef` akka, ottenibile dopo la creazione dell'istanza di `Tag`. 
+Il pattern *factory* è stato utilizzato per favorire l'usabilità della libreria, facilitando la creazione di alcuni oggetti complessi che avrebbero richiesto costruttori molto verbosi o con forti dipendenze temporali dovuti alla programmazione ad attori. Un esempio dell'applicazione di questo pattern è la generazione di un `Group` a partire da un `Tag` richiamando il *factoryMethod* `generateGroup()`, che ha come argomento una lista di `ActorRef` akka, ottenibile dopo la creazione dell'istanza di `Tag`. 
 ```scala
 case class MapTag[I,O](
 	override val id: String, 
