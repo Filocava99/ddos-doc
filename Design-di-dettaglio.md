@@ -141,7 +141,7 @@ Il metodo `deploy[T](devices: Device[T]*)` è invece il metodo che, preso uno o 
 
 Il modulo Grouping mette a disposizione un tipo particolare di device che permette di definire funzioni higher-order di aggregazione tra output di device diversi. Un gruppo è formato da due componenti principali: l'attore che definisce il behavior akka utilizzato per la gestione dei messaggi e un'istanza che implementa la classe astratta Group che ne definisce lo stato.
 
-![PPS-Grouping](https://imgur.com/a/eDLgIgc.png)
+![PPS-Grouping](https://i.imgur.com/ZbBJya1.png)
 
 ### GroupActor
 
@@ -174,7 +174,7 @@ Questo sottopackage rappresenta un'estensione del package `grouping` che consent
 Per questo motivo in questo modulo è stato fatto largo uso del pattern Factory, attraverso cui vengono generate delle istanze di `Group` rendendo trasparente all'utente l'ordine di generazione dei dispositivi sul cluster.
 Essendo un domain-specific language creato per effettuare il deployment di quanto già presente nel modulo di grouping, è inevitabilmente legato alle classi e alle implementazioni lì presenti, lasciando all'utente l'onere di estendere nel modo giusto anche questo modulo in caso abbia esteso in qualche modo `grouping`.
 
-![PPS-Tagging](https://imgur.com/JLyKAqW)
+![PPS-Tagging](https://i.imgur.com/mqPV1zG.png)
 
 ### Taggable
 
